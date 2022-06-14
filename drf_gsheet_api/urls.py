@@ -19,5 +19,5 @@ from drf_gsheet_api.views import api
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("sheet/", api.urls),
+    path("", api.urls),
 ]

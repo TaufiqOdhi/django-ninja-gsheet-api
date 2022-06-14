@@ -16,6 +16,17 @@ SCOPES = [
 ]
 
 SPREADSHEET_ID = '1FMPomLzI_iUUINCal3EwYz3NZkF4HYBgA64RQfPbTo8'
+TOKEN_LOCATION = os.path.join(BASE_DIR, 'token.json')
+
+
+def login_auth():
+    flow = InstalledAppFlow.from_client_secrets_file(
+        os.path.join(BASE_DIR, 'credentials.json'), SCOPES)
+    creds = flow.run_local_server(port=0).to_json()
+    # Save the credentials for the next run
+    with open(TOKEN_LOCATION, 'w') as token:
+        token.write(creds)
+    return creds
 
 
 def auth_google_api():
@@ -26,21 +37,14 @@ def auth_google_api():
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    token_location = os.path.join(BASE_DIR, 'token.json')
-    if os.path.exists(token_location):
-        creds = Credentials.from_authorized_user_file(token_location, SCOPES)
+    if os.path.exists(TOKEN_LOCATION):
+        creds = Credentials.from_authorized_user_file(TOKEN_LOCATION, SCOPES)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                os.path.join(BASE_DIR, 'credentials.json'), SCOPES)
-            creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
-        with open(token_location, 'w') as token:
-            token.write(creds.to_json())
-
+            login_auth()
     try:
         service = build('sheets', 'v4', credentials=creds)
         return service
