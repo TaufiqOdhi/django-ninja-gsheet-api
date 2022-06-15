@@ -22,10 +22,10 @@ TOKEN_LOCATION = os.path.join(BASE_DIR, 'token.json')
 def login_auth():
     flow = InstalledAppFlow.from_client_secrets_file(
         os.path.join(BASE_DIR, 'credentials.json'), SCOPES)
-    creds = flow.run_local_server(port=0).to_json()
+    creds = flow.run_local_server(port=0)
     # Save the credentials for the next run
     with open(TOKEN_LOCATION, 'w') as token:
-        token.write(creds)
+        token.write(creds.to_json())
     return creds
 
 
@@ -44,7 +44,7 @@ def auth_google_api():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            login_auth()
+            creds = login_auth()
     try:
         service = build('sheets', 'v4', credentials=creds)
         return service
