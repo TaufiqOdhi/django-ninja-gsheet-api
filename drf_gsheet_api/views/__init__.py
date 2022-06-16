@@ -56,4 +56,13 @@ def append_row_data(request, sheet_num: int, list_value: ListColData):
 
 @api.post("/login")
 def login(request):
-    return login_auth().to_json()
+    data = login_auth()
+    return {
+            "token": data.token,
+            "refresh_token": data.refresh_token,
+            "token_uri": data.token_uri,
+            "client_id": data.client_id,
+            "client_secret": data.client_secret,
+            "scopes": data.scopes,
+            "rapt_token": data.rapt_token,
+        }
